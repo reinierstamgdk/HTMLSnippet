@@ -51,17 +51,20 @@ define([
             var external = this.contentsPath !== "" ? true : false;
             switch (this.contenttype) {
                 case "html":
-                    if (external) {
-                        // var context = this.mxcontext;
-                        // var obj = context.getTrackObject();
-                        // obj.getGuid();  // "12345"
-                        // var ContentsString = obj.get(this.contentsPath);
-                        var TrackedContextObject = context.getTrackObject(); 
-                        var ContextObjectVal = TrackedContextObject.get(this.contentsPath);
-                        html.set(this.domNode, this.props.contentsPath);
-                        //console.log(obj);
+                    domStyle.set(this.domNode, {
+                        height: "auto",
+                        width: "100%",
+                        outline: 0
+                    });
+                    domAttr.set(this.domNode, "style", this.style);
+                    
+                    if (external && this.encloseHTMLWithDiv) {
+                        var domNode = domConstruct.create("div", {
+                            innerHTML: this.contextObj.get(this.contentsPath)
+                        });
+                        domConstruct.place(domNode, this.domNode, "only");
                     } else if (!this.encloseHTMLWithDiv) {
-                        html.set(this.domNode, this.contents);
+                        html.set(this.domNode, this.contextObj.get(this.contentsPath));
                     } else {
                         domStyle.set(this.domNode, {
                             height: "auto",
@@ -69,7 +72,7 @@ define([
                             outline: 0
                         });
 
-                        domAttr.set(this.domNode, "style", this.style); // might override height and width
+                         // might override height and width
                         var domNode = domConstruct.create("div", {
                             innerHTML: this.contents
                         });
