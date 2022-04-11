@@ -1,6 +1,7 @@
 define([
     "dojo/_base/declare",
     "mxui/widget/_WidgetBase",
+    "mendix/lib/MxContext",
     "dojo/dom-style",
     "dojo/dom-attr",
     "dojo/dom-construct",
@@ -10,12 +11,14 @@ define([
 ], function (
     declare,
     _WidgetBase,
+    context,
     domStyle,
     domAttr,
     domConstruct,
     lang,
     html,
-    LinkPane
+    LinkPane,
+    lagentaloca
 ) {
     "use strict";
 
@@ -34,31 +37,29 @@ define([
         _objectChangeHandler: null,
         contextObj: null,
 
-        postCreate: function () {
+        postCreate: function (object) {
             mx.logger.debug(this.id + ".postCreate");
             this._setupEvents();
 
             if (!this.refreshOnContextChange) {
-                this.executeCode();
+                this.executeCode(object);
             }
         },
 
-        executeCode: function () {
+        executeCode: function (obj) {
             mx.logger.debug(this.id + ".executeCode");
             var external = this.contentsPath !== "" ? true : false;
             switch (this.contenttype) {
                 case "html":
                     if (external) {
-                        new LinkPane({
-                                preload: true,
-                                loadingMessage: "",
-                                href: this.contentsPath,
-                                onDownloadError: function () {
-                                    console.log("Error loading html path");
-                                }
-                            })
-                            .placeAt(this.domNode.id)
-                            .startup();
+                        // var context = this.mxcontext;
+                        // var obj = context.getTrackObject();
+                        // obj.getGuid();  // "12345"
+                        // var ContentsString = obj.get(this.contentsPath);
+                        var TrackedContextObject = context.getTrackObject(); 
+                        var ContextObjectVal = TrackedContextObject.get(this.contentsPath);
+                        html.set(this.domNode, this.props.contentsPath);
+                        //console.log(obj);
                     } else if (!this.encloseHTMLWithDiv) {
                         html.set(this.domNode, this.contents);
                     } else {
